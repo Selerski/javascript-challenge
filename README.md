@@ -1,33 +1,27 @@
-# Technical challenge
+# Vortexa Technical challenge
 
-## How to take this test
+### Developed by Pawel Pietruszka
 
-There is no right or wrong way to do this, we are more interested in the code you write, the development process you use rather than marking your work! Set yourself a time limit and see how get on.
+## Getting Started
 
-## Data
+1. Firstly, run `npm install` and then `npm run build` in the `/client` folder.
+2. Next, go to `/server` and run `npm install` there. Once the installation is completed, key in `npm start` to serve the application from the JavaScript Express server!
+3. Alternatively, go to `/typescriptServer` and run `npm install`, followed by `npm run start`, to serve the application from a TypeScript Express server.
 
-The project contains a data set describing the location and metadata of boat ramps in Australia's Gold Coast. The data set can be found under `./data/boat_ramps.geojson`.
+The app will run on `http://localhost:3000/`.
 
-It is a standard [GeoJSON](http://geojson.org/) file, with each feature consisting of a `geometry` and `properties`, such as owner, material that the ramp is made of, etc.
+NOTE: Sometimes after `npm install` the TS server throws an error because it is, supposedly, not able to locate Express in node_modules. If you encounter this issue, it can be fixed by copying the first line of `index.ts`, pasting it again in the same place and saving the file. Some users on StackOverflow have also noticed this bug and claim it may be an issue with VSCode.
 
-## The challenge
+## Tech stack
 
-Your goal is to build a React and Redux-based UI to explore this data. The interface should have the following features:
+For this project, I have used the following tools:
 
-1. A map to be able to visualise all the boat ramps.
-2. A data visualisation of your choice that displays the number or ramps per construction material.
-3. A data visualisation of your choice that displays the number of ramps per size category (values of `area` in 3 different ranges: `[0, 50)`, `[50, 200)`, and `[200, 526)`).
-4. Zooming in the map should filter the visualised data to include only those ramps which are currently visible in the viewport.
-5. Clicking on a data point on a visualisation, should filter the ramps on the map to reflect the selected data.
+- React & Redux (front end components & state management)
+- express (server)
+- react-map-gl (map)
+- react-chartjs-2 (data visualisation)
+- Typescript - experimental server, as I had never user TS before.
 
-## Technology choices
+## Note about .env
 
-The use of React and Redux is required. You can choose to use [create-react-app](https://github.com/facebook/create-react-app) with or without TypeScript. If you prefer you can even bootstrap something on your own with webpack, or any other bundler for that matter.
-
-Apart from that, you are completely free to choose libraries, frameworks and tools to best assist you in this challenge. The choice of the method of serving the data to the UI is up to you, but it should use a RESTful API approach.
-
-## Once complete
-
-When you've finished writing your code, please put it somewhere we can clone it, for example, as a public repo in GitHub (or a private one and add us as a collabrator) and any instructions needed to run it.
-
-### Good luck!
+I deliberately kept the `.env` file in `/client`, to make sure that the map component renders without problems. While I know this is not a good practice, I will generate a new API key later this week, once the assessment is completed :)
