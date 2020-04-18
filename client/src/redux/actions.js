@@ -2,19 +2,44 @@ export const GET_VIEWPORT = 'GET_VIEWPORT';
 export const RECEIVE_COORDINATES = 'RECEIVE_COORDINATES';
 export const UPDATE_VIEWPORT = 'UPDATE_VIEWPORT';
 export const UPDATE_MATERIAL_CHART = 'UPDATE_MATERIAL_CHART';
-export const UPDATE_CHARTS = 'UPDATE_CHARTS';
-export const GET_MATERIAL_CHART_DATA = 'GET_MATERIAL_CHART_DATA';
+export const UPDATE_AREA_CHART = 'UPDATE_AREA_CHART';
 export const SET_FILTERED_DATA = 'SET_FILTERED_DATA';
 export const APPLY_FILTER = 'APPLY_FILTER';
 export const SET_POPUP_INFO = 'SET_POPUP_INFO';
 
-export const getViewport = () => ({
-  type: GET_VIEWPORT
-});
-
 export const updateViewport = (viewport) => ({
   type: UPDATE_VIEWPORT,
   viewport: viewport
+});
+
+export const updateAreaChart = (data) => ({
+  type: UPDATE_AREA_CHART,
+  areaChartData: data
+});
+
+export const updateMaterialChart = (data) => ({
+  type: UPDATE_MATERIAL_CHART,
+  materialChartData: data
+});
+
+export const receiveCoordinates = (data) => ({
+  type: RECEIVE_COORDINATES,
+  filteredData: data
+});
+
+export const toggleFilter = (bool) => ({
+  type: APPLY_FILTER,
+  filter: bool
+});
+
+export const newFilteredData = (data) => ({
+  type: SET_FILTERED_DATA,
+  filteredData: data
+});
+
+export const setPopupInfo = (popupInfo) => ({
+  type: SET_POPUP_INFO,
+  popupInfo
 });
 
 export const updateCharts = (
@@ -72,39 +97,6 @@ export const updateCharts = (
   dispatch(() => updateAreaChart(currentAreaData));
 };
 
-export const getAreaChartData = () => ({
-  type: GET_MATERIAL_CHART_DATA
-});
-
-export const updateAreaChart = (data) => ({
-  type: UPDATE_MATERIAL_CHART,
-  areaChartData: data
-});
-
-export const getMaterialChartData = () => ({
-  type: GET_MATERIAL_CHART_DATA
-});
-
-export const updateMaterialChart = (data) => ({
-  type: UPDATE_MATERIAL_CHART,
-  materialChartData: data
-});
-
-export const receiveCoordinates = (data) => ({
-  type: RECEIVE_COORDINATES,
-  filteredData: data
-});
-
-export const toggleFilter = (bool) => ({
-  type: APPLY_FILTER,
-  filter: bool
-});
-
-export const newFilteredData = (data) => ({
-  type: SET_FILTERED_DATA,
-  filteredData: data
-});
-
 export const setFilteredData = (
   data,
   materialChartData,
@@ -115,11 +107,6 @@ export const setFilteredData = (
   dispatch(newFilteredData(data));
   dispatch(updateCharts(data, materialChartData, areaChartData));
 };
-
-export const setPopupInfo = (popupInfo) => ({
-  type: SET_POPUP_INFO,
-  popupInfo
-});
 
 export const getCoordinates = (mapRef) => (dispatch) => {
   const currentView = mapRef.current.getMap();

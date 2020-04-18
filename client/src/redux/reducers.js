@@ -1,11 +1,10 @@
 import { combineReducers } from 'redux';
 import {
-  GET_VIEWPORT,
   UPDATE_VIEWPORT,
   RECEIVE_COORDINATES,
   SET_FILTERED_DATA,
   UPDATE_MATERIAL_CHART,
-  GET_MATERIAL_CHART_DATA,
+  UPDATE_AREA_CHART,
   SET_POPUP_INFO,
   APPLY_FILTER
 } from './actions';
@@ -21,8 +20,6 @@ const viewport = (
   action
 ) => {
   switch (action.type) {
-    case GET_VIEWPORT:
-      return { ...state };
     case UPDATE_VIEWPORT:
       return { ...state, ...action.viewport };
     default:
@@ -57,8 +54,6 @@ const materialChartData = (
   action
 ) => {
   switch (action.type) {
-    case GET_MATERIAL_CHART_DATA:
-      return { ...state };
     case UPDATE_MATERIAL_CHART:
       return { ...state, ...action.materialChartData };
     default:
@@ -79,9 +74,7 @@ const areaChartData = (
   action
 ) => {
   switch (action.type) {
-    case GET_MATERIAL_CHART_DATA:
-      return { ...state };
-    case UPDATE_MATERIAL_CHART:
+    case UPDATE_AREA_CHART:
       return { ...state, ...action.areaChartData };
     default:
       return state;
