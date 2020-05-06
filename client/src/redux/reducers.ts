@@ -1,4 +1,5 @@
 import { combineReducers } from 'redux';
+import { useSelector, TypedUseSelectorHook } from 'react-redux';
 import {
   UPDATE_VIEWPORT,
   RECEIVE_COORDINATES,
@@ -8,6 +9,48 @@ import {
   SET_POPUP_INFO,
   APPLY_FILTER
 } from './actions';
+import { PopupInfoType } from 'src/Components/Popups/Popups';
+import { MutableRefObject } from 'react';
+import { ViewportProps } from 'react-map-gl';
+
+export type ChartDataType = {
+  datasets: { data: number[][] }[];
+};
+
+type FeatureType = {
+  id: string;
+  geometry: { coordinates: [[[number[]]]] };
+  properties: { area_: number; material: string };
+};
+
+export type FilteredDataType = {
+  features: FeatureType[];
+};
+
+type ActionType = {
+  type: string;
+  materialChartData: ChartDataType;
+  areaChartData: ChartDataType;
+  viewport: MutableRefObject<null>;
+  filter: boolean;
+  filteredData: FilteredDataType;
+  popupInfo: PopupInfoType;
+};
+
+type ApplyFilter = {
+  filter: boolean;
+};
+
+export type RootState = {
+  filteredData: FilteredDataType;
+  materialChartData: ChartDataType;
+  areaChartData: ChartDataType;
+  viewport: ViewportProps;
+  popupInfo: PopupInfoType | null;
+  applyFilter: ApplyFilter;
+};
+
+export const useTypedSelector: TypedUseSelectorHook<RootState> = useSelector;
 
 const viewport = (
   state = {
@@ -17,7 +60,7 @@ const viewport = (
     bearing: 0,
     pitch: 0
   },
-  action
+  action: ActionType
 ) => {
   switch (action.type) {
     case UPDATE_VIEWPORT:
@@ -51,7 +94,7 @@ const materialChartData = (
       }
     ]
   },
-  action
+  action: ActionType
 ) => {
   switch (action.type) {
     case UPDATE_MATERIAL_CHART:
@@ -71,7 +114,7 @@ const areaChartData = (
       }
     ]
   },
-  action
+  action: ActionType
 ) => {
   switch (action.type) {
     case UPDATE_AREA_CHART:
@@ -81,7 +124,7 @@ const areaChartData = (
   }
 };
 
-const applyFilter = (state = { filter: true }, action) => {
+const applyFilter = (state = { filter: true }, action: ActionType) => {
   switch (action.type) {
     case APPLY_FILTER:
       return { filter: action.filter };
@@ -90,7 +133,7 @@ const applyFilter = (state = { filter: true }, action) => {
   }
 };
 
-const filteredData = (state = null, action) => {
+const filteredData = (state: null | object = null, action: ActionType) => {
   switch (action.type) {
     case RECEIVE_COORDINATES:
       return { ...state, ...action.filteredData };
@@ -101,7 +144,7 @@ const filteredData = (state = null, action) => {
   }
 };
 
-const popupInfo = (state = null, action) => {
+const popupInfo = (state: null | object = null, action: ActionType) => {
   switch (action.type) {
     case SET_POPUP_INFO:
       return action.popupInfo;

@@ -4,7 +4,14 @@ import { Popup } from 'react-map-gl';
 import { setPopupInfo } from '../../redux/actions';
 import { useDispatch } from 'react-redux';
 
-function Popups({ popupInfo }) {
+export type PopupInfoType = {
+  latitude: number;
+  longitude: number;
+  material: string;
+  area_: number;
+};
+
+const Popups = ({ popupInfo }: { popupInfo: PopupInfoType }) => {
   const dispatch = useDispatch();
   const { latitude, longitude, material, area_ } = popupInfo;
   return (
@@ -30,11 +37,11 @@ function Popups({ popupInfo }) {
       <div className="location">
         <MapIcon style={{ fill: '#f44336' }} />
         <p className="location-coordinates">
-          {Math.abs(latitude.toFixed(4))}° S, {longitude.toFixed(4)}° E
+          {latitude.toFixed(4)}° S, {longitude.toFixed(4)}° E
         </p>
       </div>
     </Popup>
   );
-}
+};
 
 export default Popups;
