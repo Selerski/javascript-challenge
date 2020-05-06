@@ -1,13 +1,26 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, FormEvent } from 'react';
 import { updateCharts, setFilteredData } from '../../redux/actions';
 import { Doughnut } from 'react-chartjs-2';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import './Charts.css';
+import { PropertyType } from 'src/Components/Markers/Markers';
+import { useTypedSelector } from 'src/redux/reducers';
+
+type ElemType = {
+  _index: number;
+  _chart: {
+    tooltip: {
+      _data: {
+        labels: string;
+      };
+    };
+  };
+};
 
 const chartConfig = {
   legend: {
     position: 'left',
-    onClick: (e) => e.stopPropagation(),
+    onClick: (e: FormEvent<HTMLInputElement>) => e.stopPropagation(),
     fontFamily: 'Chakra Petch'
   },
   cutoutPercentage: 80,
@@ -21,16 +34,14 @@ const chartConfig = {
   }
 };
 
-function Charts() {
+const Charts = () => {
   const dispatch = useDispatch();
   const {
     filteredData,
     materialChartData,
     areaChartData,
     applyFilter
-  } = useSelector((state) => {
-    return state;
-  });
+  } = useTypedSelector((state) => state);
 
   useEffect(() => {
     if (filteredData !== null && applyFilter.filter) {
@@ -38,42 +49,45 @@ function Charts() {
     }
   }, [filteredData, dispatch, materialChartData, areaChartData, applyFilter]);
 
-  function handleMaterialChart(elems) {
+  function handleMaterialChart(elems: ElemType[]) {
     if (elems[0]) {
-      let filter = elems[0]._chart.tooltip._data.labels[elems[0]._index];
+      const filter = elems[0]._chart.tooltip._data.labels[elems[0]._index];
 
-      let currentData = filteredData;
-      let changedData = currentData.features.filter(({ properties }) => {
-        return properties.material === filter;
-      });
+      const currentData = filteredData;
+      const changedData = currentData.features.filter(
+        ({ properties }: { properties: PropertyType }) =>
+          properties.material === filter
+      );
       currentData.features = changedData;
       dispatch(
         setFilteredData(currentData, materialChartData, areaChartData, false)
       );
     }
   }
-  function handleAreaChart(elems) {
+  const handleAreaChart = (elems: ElemType[]) => {
     if (elems[0]) {
-      let filter = elems[0]._chart.tooltip._data.labels[elems[0]._index].split(
-        ' '
-      )[0];
+      const filter = elems[0]._chart.tooltip._data.labels[
+        elems[0]._index
+      ].split(' ')[0];
 
-      let currentData = filteredData;
-      let changedData = currentData.features.filter(({ properties }) => {
-        if (filter === 'Small') {
-          return properties.area_ < 50;
-        } else if (filter === 'Medium') {
-          return 50 <= properties.area_ && properties.area_ < 200;
-        } else {
-          return properties.area_ >= 200;
+      const currentData = filteredData;
+      const changedData = currentData.features.filter(
+        ({ properties }: { properties: PropertyType }) => {
+          if (filter === 'Small') {
+            return properties.area_ < 50;
+          } else if (filter === 'Medium') {
+            return 50 <= properties.area_ && properties.area_ < 200;
+          } else {
+            return properties.area_ >= 200;
+          }
         }
-      });
+      );
       currentData.features = changedData;
       dispatch(
         setFilteredData(currentData, materialChartData, areaChartData, false)
       );
     }
-  }
+  };
 
   return (
     <div className="chart-container">
@@ -109,6 +123,6 @@ function Charts() {
       </div>
     </div>
   );
-}
+};
 
 export default Charts;

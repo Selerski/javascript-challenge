@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { MutableRefObject } from 'react';
 import { useDispatch } from 'react-redux';
 import { getCoordinates, toggleFilter } from '../../redux/actions';
 
-function ClearFilters({ mapRef }) {
+const ClearFilters = ({ mapRef }: { mapRef: MutableRefObject<null> }) => {
   const dispatch = useDispatch();
   return (
     <button
@@ -16,6 +16,6 @@ function ClearFilters({ mapRef }) {
       Clear Filters
     </button>
   );
-}
+};
 
 export default ClearFilters;

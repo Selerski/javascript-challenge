@@ -1,10 +1,12 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useTypedSelector } from 'src/redux/reducers';
 
-function InfoHeader() {
-  const { features, filter } = useSelector(({ filteredData, applyFilter }) => {
-    return { ...filteredData, ...applyFilter };
-  });
+const InfoHeader = () => {
+  const { features, filter } = useTypedSelector(
+    ({ filteredData, applyFilter }) => {
+      return { ...filteredData, ...applyFilter };
+    }
+  );
 
   return (
     <div className="chart-info">
@@ -29,6 +31,6 @@ function InfoHeader() {
       <p>Click a chart element to filter results</p>
     </div>
   );
-}
+};
 
 export default InfoHeader;
