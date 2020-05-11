@@ -1,14 +1,15 @@
+import { Charts } from '../Charts/Charts';
+import { InfoHeader } from '../../Components/InfoHeader/InfoHeader';
 import React from 'react';
-import Charts from '../Charts/Charts';
-import InfoHeader from '../../Components/InfoHeader/InfoHeader';
+import { infoContainer } from './Info.styles';
 
 const Info = () => {
   return (
-    <div className="info-container">
+    <div className={infoContainer}>
       <InfoHeader />
       <Charts />
     </div>
   );
 };
 
-export default Info;
+export { Info };

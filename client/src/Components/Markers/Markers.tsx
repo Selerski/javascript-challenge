@@ -1,60 +1,47 @@
-import React from 'react';
-import { Marker } from 'react-map-gl';
-import { useDispatch } from 'react-redux';
 import DirectionsBoatIcon from '@material-ui/icons/DirectionsBoat';
+import { Marker } from 'react-map-gl';
+import React from 'react';
 import { setPopupInfo } from '../../redux/actions';
-import { FilteredDataType } from 'src/redux/reducers';
+import { useDispatch } from 'react-redux';
+import { FeatureType } from '../../util/types';
+import { iconWrapper } from './Markers.styles';
 
-export type PropertyType = {
-  material: string;
-  area_: number;
-};
-export type GeometryType = {
-  coordinates: [[[number[]]]];
+const boatStyles = {
+  fill: '#424242',
+  fontSize: 20
 };
 
-const Markers = ({ data }: { data: FilteredDataType }) => {
+const Markers = ({ data }: { data: FeatureType[] }) => {
   const dispatch = useDispatch();
-
-  function handleClick(properties: PropertyType, geometry: GeometryType) {
-    return () =>
-      dispatch(
-        setPopupInfo({
-          longitude: geometry.coordinates[0][0][0][0],
-          latitude: geometry.coordinates[0][0][0][1],
-          material: properties.material,
-          area_: properties.area_
-        })
-      );
-  }
 
   return (
     <>
-      {' '}
-      {data
-        ? data.features.map(({ id, properties, geometry }) => (
-            <Marker
-              key={id}
-              captureClick={true}
-              latitude={geometry.coordinates[0][0][0][1]}
-              longitude={geometry.coordinates[0][0][0][0]}
-            >
-              <div
-                onClick={handleClick(properties, geometry)}
-                className="icon-wrapper"
-              >
-                <DirectionsBoatIcon
-                  style={{
-                    fill: '#424242',
-                    fontSize: 20
-                  }}
-                />
-              </div>
-            </Marker>
-          ))
-        : null}
+      {data.map(({ id, properties, geometry }) => (
+        <Marker
+          key={id}
+          captureClick={true}
+          latitude={geometry.coordinates[0][0][0][1]}
+          longitude={geometry.coordinates[0][0][0][0]}
+        >
+          <div
+            onClick={() =>
+              dispatch(
+                setPopupInfo({
+                  longitude: geometry.coordinates[0][0][0][0],
+                  latitude: geometry.coordinates[0][0][0][1],
+                  material: properties.material,
+                  area_: properties.area_
+                })
+              )
+            }
+            className={iconWrapper}
+          >
+            <DirectionsBoatIcon style={boatStyles} />
+          </div>
+        </Marker>
+      ))}
     </>
   );
 };
 
-export default Markers;
+export { Markers };

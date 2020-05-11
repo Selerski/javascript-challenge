@@ -1,21 +1,21 @@
 import React, { useEffect, useRef } from 'react';
 import MapGL, { NavigationControl } from 'react-map-gl';
-import ClearFilters from '../../Components/ClearFilters/ClearFilters';
-import Markers from '../../Components/Markers/Markers';
-import Popups from '../../Components/Popups/Popups';
+import { ClearFilters } from '../../Components/ClearFilters/ClearFilters';
+import { Markers } from '../../Components/Markers/Markers';
+import { Popups } from '../../Components/Popups/Popups';
 import { updateViewport, getCoordinates } from '../../redux/actions';
-import { useDispatch } from 'react-redux';
-import { useTypedSelector } from '../../redux/reducers';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from 'src/util/types';
 
 const Maps = () => {
   const dispatch = useDispatch();
-  const { filteredData, viewport, popupInfo, applyFilter } = useTypedSelector(
-    (state) => state
-  );
 
-  const { filter } = applyFilter;
+  const features = useSelector((state: RootState) => state.features);
+  const viewport = useSelector((state: RootState) => state.viewport);
+  const popupInfo = useSelector((state: RootState) => state.popupInfo);
+  const filter = useSelector((state: RootState) => state.applyFilter.filter);
 
-  const mapRef = useRef(null);
+  const mapRef = useRef<null>(null);
 
   useEffect(() => {
     if (mapRef !== null && filter) {
@@ -42,8 +42,8 @@ const Maps = () => {
               }
             />
           </div>
-          {filteredData && <Markers data={filteredData} />}
-          {popupInfo && <Popups popupInfo={popupInfo} />}
+          <Markers data={features} />
+          <Popups popupInfo={popupInfo} />
         </MapGL>
         {!filter && <ClearFilters mapRef={mapRef} />}
       </div>
@@ -51,4 +51,4 @@ const Maps = () => {
   );
 };
 
-export default Maps;
+export { Maps };
