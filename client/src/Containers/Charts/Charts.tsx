@@ -1,23 +1,17 @@
-import React, { useEffect, FormEvent } from 'react';
-import { updateCharts, setFilteredData } from '../../redux/actions';
+import './Charts.styles.ts';
+
+import React, { FormEvent, useEffect } from 'react';
+import { setFilteredData, updateCharts } from '../../redux/actions';
 import { Doughnut } from 'react-chartjs-2';
-import { useDispatch } from 'react-redux';
-import './Charts.css';
-import { PropertyType } from 'src/Components/Markers/Markers';
-import { useTypedSelector } from 'src/redux/reducers';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  FeatureType,
+  ElemType,
+  RootState
+} from '../../util/types';
+import { charts } from './Charts.styles';
 
-type ElemType = {
-  _index: number;
-  _chart: {
-    tooltip: {
-      _data: {
-        labels: string;
-      };
-    };
-  };
-};
-
-const chartConfig = {
+const chartConfig = (text: string) => ({
   legend: {
     position: 'left',
     onClick: (e: FormEvent<HTMLInputElement>) => e.stopPropagation(),
@@ -30,49 +24,50 @@ const chartConfig = {
     fontColor: '#00695c',
     position: 'top',
     fontSize: 16,
-    fontFamily: 'Chakra Petch'
+    fontFamily: 'Chakra Petch',
+    text
   }
-};
+});
+
+const materialDoughnutConfig = chartConfig('Ramps per construction material');
+const areaDoughnutConfig = chartConfig('Ramps per surface area');
 
 const Charts = () => {
   const dispatch = useDispatch();
-  const {
-    filteredData,
-    materialChartData,
-    areaChartData,
-    applyFilter
-  } = useTypedSelector((state) => state);
+
+  const features = useSelector((state: RootState) => state.features);
+  const applyFilter = useSelector((state: RootState) => state.applyFilter);
+  const materialChartData = useSelector(
+    (state: RootState) => state.materialChartData
+  );
+  const areaChartData = useSelector((state: RootState) => state.areaChartData);
 
   useEffect(() => {
-    if (filteredData !== null && applyFilter.filter) {
-      dispatch(updateCharts(filteredData, materialChartData, areaChartData));
+    if (features && applyFilter.filter) {
+      dispatch(updateCharts(features));
     }
-  }, [filteredData, dispatch, materialChartData, areaChartData, applyFilter]);
+  }, [features, dispatch, applyFilter]);
 
-  function handleMaterialChart(elems: ElemType[]) {
-    if (elems[0]) {
-      const filter = elems[0]._chart.tooltip._data.labels[elems[0]._index];
+  const handleMaterialChart = (elems: ElemType[]) => {
+    const filter = elems[0]?._chart?.tooltip?._data?.labels[elems[0]?._index];
 
-      const currentData = filteredData;
-      const changedData = currentData.features.filter(
-        ({ properties }: { properties: PropertyType }) =>
+    if (filter) {
+      const changedData = features.filter(
+        ({ properties }: { properties: FeatureType['properties'] }) =>
           properties.material === filter
       );
-      currentData.features = changedData;
-      dispatch(
-        setFilteredData(currentData, materialChartData, areaChartData, false)
-      );
+      dispatch(setFilteredData(changedData, false));
     }
-  }
-  const handleAreaChart = (elems: ElemType[]) => {
-    if (elems[0]) {
-      const filter = elems[0]._chart.tooltip._data.labels[
-        elems[0]._index
-      ].split(' ')[0];
+  };
 
-      const currentData = filteredData;
-      const changedData = currentData.features.filter(
-        ({ properties }: { properties: PropertyType }) => {
+  const handleAreaChart = (elems: ElemType[]) => {
+    const filter = elems[0]?._chart?.tooltip?._data?.labels[
+      elems[0]?._index
+    ].split(' ')[0];
+
+    if (filter) {
+      const changedData = features.filter(
+        ({ properties }: { properties: FeatureType['properties'] }) => {
           if (filter === 'Small') {
             return properties.area_ < 50;
           } else if (filter === 'Medium') {
@@ -82,42 +77,23 @@ const Charts = () => {
           }
         }
       );
-      currentData.features = changedData;
-      dispatch(
-        setFilteredData(currentData, materialChartData, areaChartData, false)
-      );
+      dispatch(setFilteredData(changedData, false));
     }
   };
 
   return (
-    <div className="chart-container">
-      <div className="chart-wrapper">
+    <div className={charts.chartContainer}>
+      <div className={charts.chartWrapper}>
         <Doughnut
           data={materialChartData}
-          options={{
-            ...chartConfig,
-            ...{
-              title: {
-                ...chartConfig.title,
-                text: 'Ramps per construction material'
-              }
-            }
-          }}
+          options={materialDoughnutConfig}
           onElementsClick={(elems) => handleMaterialChart(elems)}
         />
       </div>
-      <div className="chart-wrapper">
+      <div className={charts.chartWrapper}>
         <Doughnut
           data={areaChartData}
-          options={{
-            ...chartConfig,
-            ...{
-              title: {
-                ...chartConfig.title,
-                text: 'Ramps per size category'
-              }
-            }
-          }}
+          options={areaDoughnutConfig}
           onElementsClick={(elems) => handleAreaChart(elems)}
         />
       </div>
@@ -125,4 +101,4 @@ const Charts = () => {
   );
 };
 
-export default Charts;
+export { Charts };

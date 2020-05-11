@@ -1,56 +1,5 @@
+import { ActionType, ActionKeywords} from '../util/types';
 import { combineReducers } from 'redux';
-import { useSelector, TypedUseSelectorHook } from 'react-redux';
-import {
-  UPDATE_VIEWPORT,
-  RECEIVE_COORDINATES,
-  SET_FILTERED_DATA,
-  UPDATE_MATERIAL_CHART,
-  UPDATE_AREA_CHART,
-  SET_POPUP_INFO,
-  APPLY_FILTER
-} from './actions';
-import { PopupInfoType } from 'src/Components/Popups/Popups';
-import { MutableRefObject } from 'react';
-import { ViewportProps } from 'react-map-gl';
-
-export type ChartDataType = {
-  datasets: { data: number[][] }[];
-};
-
-type FeatureType = {
-  id: string;
-  geometry: { coordinates: [[[number[]]]] };
-  properties: { area_: number; material: string };
-};
-
-export type FilteredDataType = {
-  features: FeatureType[];
-};
-
-type ActionType = {
-  type: string;
-  materialChartData: ChartDataType;
-  areaChartData: ChartDataType;
-  viewport: MutableRefObject<null>;
-  filter: boolean;
-  filteredData: FilteredDataType;
-  popupInfo: PopupInfoType;
-};
-
-type ApplyFilter = {
-  filter: boolean;
-};
-
-export type RootState = {
-  filteredData: FilteredDataType;
-  materialChartData: ChartDataType;
-  areaChartData: ChartDataType;
-  viewport: ViewportProps;
-  popupInfo: PopupInfoType | null;
-  applyFilter: ApplyFilter;
-};
-
-export const useTypedSelector: TypedUseSelectorHook<RootState> = useSelector;
 
 const viewport = (
   state = {
@@ -63,7 +12,7 @@ const viewport = (
   action: ActionType
 ) => {
   switch (action.type) {
-    case UPDATE_VIEWPORT:
+    case ActionKeywords.UPDATE_VIEWPORT:
       return { ...state, ...action.viewport };
     default:
       return state;
@@ -97,8 +46,11 @@ const materialChartData = (
   action: ActionType
 ) => {
   switch (action.type) {
-    case UPDATE_MATERIAL_CHART:
-      return { ...state, ...action.materialChartData };
+    case ActionKeywords.UPDATE_MATERIAL_CHART:
+      return {
+        ...state,
+        ...Object.assign(state.datasets[0].data, action.materialChartData)
+      };
     default:
       return state;
   }
@@ -117,8 +69,11 @@ const areaChartData = (
   action: ActionType
 ) => {
   switch (action.type) {
-    case UPDATE_AREA_CHART:
-      return { ...state, ...action.areaChartData };
+    case ActionKeywords.UPDATE_AREA_CHART:
+      return {
+        ...state,
+        ...Object.assign(state.datasets[0].data, action.areaChartData)
+      };
     default:
       return state;
   }
@@ -126,27 +81,27 @@ const areaChartData = (
 
 const applyFilter = (state = { filter: true }, action: ActionType) => {
   switch (action.type) {
-    case APPLY_FILTER:
+    case ActionKeywords.APPLY_FILTER:
       return { filter: action.filter };
     default:
       return state;
   }
 };
 
-const filteredData = (state: null | object = null, action: ActionType) => {
+const features = (state = [], action: ActionType) => {
   switch (action.type) {
-    case RECEIVE_COORDINATES:
-      return { ...state, ...action.filteredData };
-    case SET_FILTERED_DATA:
-      return { ...state, ...action.filteredData };
+    case ActionKeywords.RECEIVE_COORDINATES:
+      return [...action.features];
+    case ActionKeywords.SET_FILTERED_DATA:
+      return [...action.features];
     default:
       return state;
   }
 };
 
-const popupInfo = (state: null | object = null, action: ActionType) => {
+const popupInfo = (state = null, action: ActionType) => {
   switch (action.type) {
-    case SET_POPUP_INFO:
+    case ActionKeywords.SET_POPUP_INFO:
       return action.popupInfo;
     default:
       return state;
@@ -159,7 +114,7 @@ const rootReducer = combineReducers({
   areaChartData,
   popupInfo,
   applyFilter,
-  filteredData
+  features
 });
 
-export default rootReducer;
+export { rootReducer };

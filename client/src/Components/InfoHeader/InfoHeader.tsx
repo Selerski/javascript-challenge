@@ -1,31 +1,31 @@
 import React from 'react';
-import { useTypedSelector } from 'src/redux/reducers';
+import { RootState } from '../../util/types';
+import { infoHeader } from './InfoHeader.styles';
+import { useSelector } from 'react-redux';
 
 const InfoHeader = () => {
-  const { features, filter } = useTypedSelector(
-    ({ filteredData, applyFilter }) => {
-      return { ...filteredData, ...applyFilter };
-    }
-  );
+  const features = useSelector((state: RootState) => state.features);
+  const filter = useSelector((state: RootState) => state.applyFilter.filter);
 
   return (
-    <div className="chart-info">
-      {features.length === 0 ? (
-        <h3 className="info-header">There are no ramps in your viewport.</h3>
-      ) : (
-        <h3 className="info-header">
-          {filter && (
+    <div className={infoHeader.infoContainer}>
+      {features ? (
+        <h3 className={infoHeader.infoWrapper}>
+          {filter ? (
             <span>
               There {features.length > 1 ? 'are' : 'is'} {features.length}{' '}
               {features.length > 1 ? 'ramps' : 'ramp'} in this area.{' '}
             </span>
-          )}
-          {!filter && (
+          ) : (
             <span>
               Your selection returned {features.length}{' '}
               {features.length === 1 ? 'ramp' : 'ramps'}.
             </span>
           )}
+        </h3>
+      ) : (
+        <h3 className={infoHeader.infoWrapper}>
+          There are no ramps in your viewport.
         </h3>
       )}
       <p>Click a chart element to filter results</p>
@@ -33,4 +33,4 @@ const InfoHeader = () => {
   );
 };
 
-export default InfoHeader;
+export { InfoHeader };
