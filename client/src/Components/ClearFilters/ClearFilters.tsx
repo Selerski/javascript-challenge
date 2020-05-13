@@ -1,16 +1,15 @@
-import React, { MutableRefObject } from 'react';
+import React from 'react';
 import { useDispatch } from 'react-redux';
-import { getCoordinates, toggleFilter } from '../../redux/actions';
+import { toggleFilter } from '../../redux/actions';
 import { disableFilter } from './ClearFilter.styles';
 
-const ClearFilters = ({ mapRef }: { mapRef: MutableRefObject<null> }) => {
+const ClearFilters = () => {
   const dispatch = useDispatch();
   return (
     <button
       className={disableFilter}
       onClick={() => {
         dispatch(toggleFilter(true));
-        dispatch(getCoordinates(mapRef));
       }}
     >
       {' '}

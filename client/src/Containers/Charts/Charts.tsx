@@ -1,15 +1,89 @@
 import './Charts.styles.ts';
 
-import React, { FormEvent, useEffect } from 'react';
-import { setFilteredData, updateCharts } from '../../redux/actions';
-import { Doughnut } from 'react-chartjs-2';
-import { useDispatch, useSelector } from 'react-redux';
 import {
-  FeatureType,
   ElemType,
-  RootState
+  FeatureType,
+  NewChartData,
+  ChartDataType,
+  useStateSelector,
+  MaterialChartKeys
 } from '../../util/types';
+import React, { FormEvent } from 'react';
+import { useDispatch } from 'react-redux';
+
+import { Doughnut } from 'react-chartjs-2';
 import { charts } from './Charts.styles';
+import { newFilteredData } from '../../redux/actions';
+
+const { chartWrapper, chartContainer } = charts;
+
+const materialChart: ChartDataType = {
+  labels: [
+    'Concrete',
+    'Gravel',
+    'Bitumen',
+    'Other',
+    'Interlock Conc Block',
+    'Earth'
+  ],
+  datasets: [
+    {
+      data: [],
+      backgroundColor: [
+        '#00695c',
+        '#00897b',
+        '#26a69a',
+        '#1de9b6',
+        '#64ffda',
+        '#a7ffeb'
+      ]
+    }
+  ]
+};
+
+const areaChart: ChartDataType = {
+  labels: [`Small (< 50 sq.m)`, 'Medium (< 200 sq.m)', 'Large (> 200 sq.m)'],
+  datasets: [
+    {
+      data: [],
+      backgroundColor: ['#00695c', '#1de9b6', '#a7ffeb']
+    }
+  ]
+};
+
+const calculateData = (features: FeatureType[]) => {
+  const newMaterialData: NewChartData = [
+    { Concrete: 0 },
+    { Gravel: 0 },
+    { Bitumen: 0 },
+    { Other: 0 },
+    { 'Interlock Conc Block': 0 },
+    { Earth: 0 }
+  ];
+  const newAreaData = [0, 0, 0];
+
+  features.forEach(({ properties }) => {
+    const area_: number = properties.area_;
+
+    newMaterialData[MaterialChartKeys[properties.material]][
+      properties.material
+    ]++;
+
+    if (area_ < 50) {
+      newAreaData[0]++;
+    } else if (area_ >= 50 && area_ < 200) {
+      newAreaData[1]++;
+    } else if (area_ >= 200 && area_ < 526) {
+      newAreaData[2]++;
+    }
+  });
+
+  areaChart.datasets[0].data = newAreaData ?? [];
+  materialChart.datasets[0].data =
+    newMaterialData.map((item) => Object.values(item)[0]) ?? [];
+
+  return { areaChart, materialChart };
+};
 
 const chartConfig = (text: string) => ({
   legend: {
@@ -34,29 +108,19 @@ const areaDoughnutConfig = chartConfig('Ramps per surface area');
 
 const Charts = () => {
   const dispatch = useDispatch();
-
-  const features = useSelector((state: RootState) => state.features);
-  const applyFilter = useSelector((state: RootState) => state.applyFilter);
-  const materialChartData = useSelector(
-    (state: RootState) => state.materialChartData
+  const features = useStateSelector(({ features }) => features);
+  const { areaChart, materialChart } = useStateSelector(({ features }) =>
+    calculateData(features)
   );
-  const areaChartData = useSelector((state: RootState) => state.areaChartData);
-
-  useEffect(() => {
-    if (features && applyFilter.filter) {
-      dispatch(updateCharts(features));
-    }
-  }, [features, dispatch, applyFilter]);
 
   const handleMaterialChart = (elems: ElemType[]) => {
     const filter = elems[0]?._chart?.tooltip?._data?.labels[elems[0]?._index];
 
     if (filter) {
       const changedData = features.filter(
-        ({ properties }: { properties: FeatureType['properties'] }) =>
-          properties.material === filter
+        ({ properties }) => properties.material === filter
       );
-      dispatch(setFilteredData(changedData, false));
+      dispatch(newFilteredData(changedData ?? [], changedData ? false : true));
     }
   };
 
@@ -66,33 +130,32 @@ const Charts = () => {
     ].split(' ')[0];
 
     if (filter) {
-      const changedData = features.filter(
-        ({ properties }: { properties: FeatureType['properties'] }) => {
-          if (filter === 'Small') {
-            return properties.area_ < 50;
-          } else if (filter === 'Medium') {
-            return 50 <= properties.area_ && properties.area_ < 200;
-          } else {
-            return properties.area_ >= 200;
-          }
+      const changedData = features.filter(({ properties }) => {
+        if (filter === 'Small') {
+          return properties.area_ < 50;
+        } else if (filter === 'Medium') {
+          return 50 <= properties.area_ && properties.area_ < 200;
+        } else {
+          return properties.area_ >= 200;
         }
-      );
-      dispatch(setFilteredData(changedData, false));
+      });
+
+      dispatch(newFilteredData(changedData ?? [], changedData ? false : true));
     }
   };
 
   return (
-    <div className={charts.chartContainer}>
-      <div className={charts.chartWrapper}>
+    <div className={chartContainer}>
+      <div className={chartWrapper}>
         <Doughnut
-          data={materialChartData}
+          data={materialChart}
           options={materialDoughnutConfig}
           onElementsClick={(elems) => handleMaterialChart(elems)}
         />
       </div>
-      <div className={charts.chartWrapper}>
+      <div className={chartWrapper}>
         <Doughnut
-          data={areaChartData}
+          data={areaChart}
           options={areaDoughnutConfig}
           onElementsClick={(elems) => handleAreaChart(elems)}
         />

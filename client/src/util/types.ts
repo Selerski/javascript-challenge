@@ -1,13 +1,15 @@
-import { MutableRefObject, Dispatch } from 'react';
-import { ViewportProps } from 'react-map-gl';
+import { MutableRefObject } from 'react';
+import { Action as ReduxAction } from 'redux-actions';
+import { TypedUseSelectorHook, useSelector } from 'react-redux';
 
 export type ChartDataType = {
-  datasets: { data: number[][] }[];
+  labels: string[];
+  datasets: { data: number[]; backgroundColor: string[] }[];
 };
 
 export type NewChartData = { [name: string]: number }[];
 
-export enum ChartKeys {
+export enum MaterialChartKeys {
   'Concrete',
   'Gravel',
   'Bitumen',
@@ -15,6 +17,8 @@ export enum ChartKeys {
   'Interlock Conc Block',
   'Earth'
 }
+
+export const useStateSelector: TypedUseSelectorHook<RootState> = useSelector;
 
 export enum ActionKeywords {
   GET_VIEWPORT = 'GET_VIEWPORT',
@@ -30,30 +34,36 @@ export enum ActionKeywords {
 export type FeatureType = {
   id: string;
   geometry: { coordinates: [[[number[]]]] };
-  properties: { area_: number; material: keyof typeof ChartKeys };
+  properties: { area_: number; material: keyof typeof MaterialChartKeys };
 };
 
 export type ActionType = {
   type: string;
-  materialChartData: ChartDataType;
-  areaChartData: ChartDataType;
   viewport: MutableRefObject<null>;
   filter: boolean;
   features: FeatureType[];
-  popupInfo: PopupInfoType;
+  popupInfo: PopupInfoType | null;
 };
 
-type ApplyFilter = {
-  filter: boolean;
+export type Viewport = {
+  longitude: number;
+  latitude: number;
+  zoom: number;
+  bearing: number;
+  pitch: number;
 };
 
 export type RootState = {
   features: FeatureType[];
-  materialChartData: ChartDataType;
-  areaChartData: ChartDataType;
-  viewport: ViewportProps;
-  popupInfo: PopupInfoType;
-  applyFilter: ApplyFilter;
+  viewport: Viewport;
+  popupInfo: PopupInfoType | null;
+  filter: boolean;
+};
+
+export declare type ActionWithPayload<T = void> = ReduxAction<T> & {
+  type: string;
+  payload: T;
+  error?: any;
 };
 
 export type PopupInfoType = {
@@ -67,19 +77,11 @@ export type GeometryType = {
   coordinates: [[[number[]]]];
 };
 
-type ToggleType = {
-  type: string;
-  filter: boolean;
-};
 export type ChartActions =
   | { type: string; materialChartData: number[][] }
   | { type: string; areaChartData: number[][] };
 
-type UpdateChartType = (dispatch: Dispatch<ChartActions>) => void;
-
-type Features = { type: string; features: FeatureType[] };
-
-export type Data = ToggleType | UpdateChartType | Features;
+export type Features = { type: string; features: FeatureType[] };
 
 export type ElemType = {
   _index: number;

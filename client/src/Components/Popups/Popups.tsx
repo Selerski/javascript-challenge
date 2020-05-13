@@ -10,16 +10,28 @@ const iconStyle = {
   fill: '#f44336'
 };
 
-const Popups = ({ popupInfo }: { popupInfo: PopupInfoType }) => {
+const {
+  popupWrapper,
+  materialStyle,
+  area,
+  popupHeader,
+  location,
+  locationCoordinates
+} = popups;
+
+const Popups = ({ popupInfo }: { popupInfo: PopupInfoType | null }) => {
   const dispatch = useDispatch();
-  const latitude = popupInfo?.latitude;
-  const longitude = popupInfo?.longitude;
-  const material = popupInfo?.material;
-  const area_ = popupInfo?.area_;
+  const { area_, material, longitude, latitude } = popupInfo ?? {
+    area_: 0,
+    material: '',
+    longitude: 0,
+    latitude: 0
+  };
+
   return (
     (popupInfo && (
       <Popup
-        className={popups.popupWrapper}
+        className={popupWrapper}
         tipSize={5}
         anchor="top"
         longitude={longitude}
@@ -27,19 +39,19 @@ const Popups = ({ popupInfo }: { popupInfo: PopupInfoType }) => {
         closeOnClick={false}
         onClose={() => dispatch(setPopupInfo(null))}
       >
-        <div className={popups.material}>
-          <h3 className={popups.popupHeader}>Material:</h3>
+        <div className={materialStyle}>
+          <h3 className={popupHeader}>Material:</h3>
           <p>{material}</p>
         </div>
-        <div className={popups.area}>
-          <h3 className={popups.popupHeader}>Area:</h3>
+        <div className={area}>
+          <h3 className={popupHeader}>Area:</h3>
           <p>
             {area_} m<sup>2</sup>
           </p>
         </div>
-        <div className={popups.location}>
+        <div className={location}>
           <MapIcon style={iconStyle} />
-          <p className={popups.locationCoordinates}>
+          <p className={locationCoordinates}>
             {latitude.toFixed(4)}° S, {longitude.toFixed(4)}° E
           </p>
         </div>

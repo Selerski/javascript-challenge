@@ -21,7 +21,7 @@ export const popups = stylesheet({
       }
     }
   },
-  material: {
+  materialStyle: {
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
